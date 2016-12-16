@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>KityMinder Editor - Powered By FEX</title>
+    <meta charset="utf-8">
+    <title>KityMinder Editor - Powered By FEX</title>
 
-	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
+    <link href="favicon.ico" type="image/x-icon" rel="shortcut icon">
 
-	<!-- bower:css -->
-	<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
-	<link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css" />
-	<link rel="stylesheet" href="../bower_components/hotbox/hotbox.css" />
-	<link rel="stylesheet" href="../bower_components/kityminder-core/dist/kityminder.core.css" />
-	<link rel="stylesheet" href="../bower_components/color-picker/dist/color-picker.min.css" />
-	<!-- endbower -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css"/>
+    <link rel="stylesheet" href="../bower_components/hotbox/hotbox.css"/>
+    <link rel="stylesheet" href="../bower_components/kityminder-core/dist/kityminder.core.css"/>
+    <link rel="stylesheet" href="../bower_components/color-picker/dist/color-picker.min.css"/>
+    <!-- endbower -->
 
-	<link rel="stylesheet" href="kityminder.editor.min.css">
+    <link rel="stylesheet" href="kityminder.editor.min.css">
 
-	<style>
+    <style>
 		html, body {
 			margin: 0;
 			padding: 0;
@@ -41,15 +41,26 @@
 			left: 0;
 			right: 0;
 		}
-	</style>
+
+
+
+
+
+
+
+
+    </style>
 </head>
 <body ng-app="kityminderDemo" ng-controller="MainController">
-<h1 class="editor-title">KityMinder Editor - Powered By FEX</h1>
+<h5><label class="editor-title">KityMinder Editor - Powered By FEX</label>
+    <button id="edit-save">保存</button>
+</h5>
 <kityminder-editor on-init="initEditor(editor, minder)"></kityminder-editor>
 </body>
 
 <!-- bower:js -->
 <script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../dist/json2.js"></script>
 <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
 <script src="../bower_components/angular/angular.js"></script>
 <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -71,6 +82,7 @@
 <!-- endbower -->
 
 <script src="kityminder.editor.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 
 
 <script>
@@ -84,6 +96,102 @@
 					window.minder = minder;
 				};
 			});
+
+	$(function(event,$http){
+         $('#edit-save').on('click', function(){
+             var obj=window.minder.exportJson()
+
+             var memberFilter = new Array();
+             memberFilter[0] = "root";
+             memberFilter[1] = "template";
+             memberFilter[2] = "theme";
+             memberFilter[3] = "version";
+             console.log(JSON.stringify(obj))
+             //console.log(obj.toJSONString())
+
+             var data={
+             minder_id:123,
+             minder_key:"testjsona",
+             }
+             add_minder(JSON.stringify(obj))
+             //$(document).ready(sqlConn)
+             console.log(window.minder.exportJson())
+         });
+     });
+
+     add_minder=function(obj){
+        console.log(obj)
+        $.ajax({
+        type: "POST",
+        crossDomain: true,
+        dataType: 'json',
+        data:obj,
+        contentType: "application/json",
+        async: false,
+        url: "http://127.0.0.1:8001/db/test?callback=?",
+        headers: {
+            "Access-Control-Allow-Origin":"*",
+            "Access-Control-Allow-Methods":"POST",
+            "Access-Control-Max-Age": "1000"
+        },
+        xhrFields: {
+            withCredentials: true
+        }
+        })
+        .success(function(response) {
+            console.log("resp");
+            window.minder.importJson(response)
+            console.log(response)
+            console.log("done");
+        })
+        .fail( function(xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+            alert(textStatus);
+            alert(errorThrown);
+        });
+        }
+
+/*
+     add_minder=function(){
+        console.log('111')
+        var data={
+            minder_id:123,
+            minder_key:"test",
+        };
+        var url="http://localhost:8001/db/save"
+        $.post(url, data).success(function(result) {
+            console.log('suc')
+        });
+
+
+        <!--$.post("http://localhost:8000/db/save",data)-->
+        <!--.done(function(data){-->
+            <!--console.log('suc')-->
+            <!--//document.getElementById("show").innerHTML = data.name + ' ' + data.gender;-->
+        <!--});-->
+    }
+
+
+     sqlConn=function(s){
+           var mysql = require('mysql');
+           var mc = mysql.createConnection({
+			   user:'lily',
+			   password:'123'
+		   });
+		   mc.connect();
+		   mc.query('use minder');
+		   mc.query('select * from minder_list',function(err,res,fields){
+			   console.log(res);
+		   });
+		   console.log('get sql')
+           mc.end();
+      }; 
+*/
+
+
+
+
+
 
 </script>
 
